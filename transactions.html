@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image:url('images/download.jpg');
+
+
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 50px;
+        }
+        .container {
+            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .transactions {
+            margin-top: 30px;
+        }
+        .transactions h2 {
+            color: #555;
+        }
+        #transaction-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #transaction-list li {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: transform 0.2s ease-in-out;
+        }
+        #transaction-list li:hover {
+            transform: scale(1.02);
+        }
+        #transaction-list .income {
+            border-left: 5px solid #28a745;
+        }
+        #transaction-list .expense {
+            border-left: 5px solid #dc3545;
+        }
+        #transaction-list .delete-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #transaction-list li:hover .delete-btn {
+            opacity: 1;
+        }
+        .back-btn, .print-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .back-btn:hover, .print-btn:hover {
+            text-decoration: underline;
+        }
+        .print-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .print-btn:hover {
+            background-color: #0056b3;
+            text-decoration: none;
+        }
+        /* Hide buttons when printing */
+        @media print {
+            .back-btn, .print-btn, .delete-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Transaction History</h1>
+        <ul id="transaction-list">
+        </ul>
+        <button id="print-button" class="print-btn">Print History</button>
+        <a href="index.html" class="back-btn">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        const list = document.getElementById('transaction-list');
+        const printButton = document.getElementById('print-button');
+        let transactions = [];
+
+        function init() {
+            const storedTransactions = JSON.parse(localStorage.getItem('transactions'));
+            if (storedTransactions) {
+                transactions = storedTransactions;
+                renderTransactions();
+            }
+        }
+
+        function renderTransactions() {
+            list.innerHTML = '';
+            transactions.forEach(t => {
+                const li = document.createElement('li');
+                const sign = t.amount < 0 ? '-' : '+';
+                const className = t.amount < 0 ? 'expense' : 'income';
+                
+                li.classList.add(className);
+                li.innerHTML = `
+                    ${t.text} <span>${sign}$${Math.abs(t.amount).toFixed(2)}</span>
+                    <button class="delete-btn" onclick="deleteTransaction(${t.id})">x</button>
+                `;
+                
+                list.appendChild(li);
+            });
+        }
+
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            renderTransactions(); 
+            // This function is just for demonstration purposes
+            updateIndexPage();
+        }
+
+        function updateIndexPage() {
+            // A function to update the main page if needed.
+        }
+
+        // Add event listener for the print button
+        printButton.addEventListener('click', () => {
+            window.print();
+        });
+
+        init();
+    </script>
+</body>
+</html>
